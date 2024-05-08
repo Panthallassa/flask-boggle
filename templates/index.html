@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Boggle!</title>
+	</head>
+	<body>
+		<h1>Let's Play Boggle</h1>
+		<table>
+			{% for row in board %}
+			<tr>
+				{% for letter in row %}
+				<td>{{letter}}</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</table>
+
+		<form id="guess-form">
+			<label for="guess">Make A Guess:</label>
+			<input type="text" name="guess" id="guess-input" />
+			<button type="submit">Submit Guess</button>
+		</form>
+
+		<div class="server-response"></div>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script src="/static/app.js"></script>
+	</body>
+</html>
