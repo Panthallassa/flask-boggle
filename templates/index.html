@@ -6,10 +6,18 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0"
 		/>
-		<title>Boggle!</title>
+		<title>{% block title %}Boggle!{% endblock %}</title>
 	</head>
 	<body>
+		{% block content %}
 		<h1>Let's Play Boggle</h1>
+		<div id="score">
+			Score:
+			<span id="score-value"></span>
+		</div>
+		<div id="timer">
+			Time Left: <span id="time-left">60</span> seconds
+		</div>
 		<table>
 			{% for row in board %}
 			<tr>
@@ -21,15 +29,17 @@
 		</table>
 
 		<form id="guess-form">
-			<label for="guess">Make A Guess:</label>
+			<label for="guess-input">Make A Guess:</label>
 			<input type="text" name="guess" id="guess-input" />
 			<button type="submit">Submit Guess</button>
 		</form>
 
 		<div class="server-response"></div>
 
+		{% endblock %}
+
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-		<script src="/static/app.js"></script>
+		<script src="/static/boggle.js"></script>
 	</body>
 </html>

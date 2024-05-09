@@ -1,0 +1,8 @@
+{% extends 'index.html' %} {% block title %}Game Over{%
+endblock %} {% block content %}
+<h1>Game Over!</h1>
+<p>Times up! Good job!</p>
+<p>Highest Score: {{ highest_score }}</p>
+<p>Number of Times Played: {{ num_games_played }}</p>
+<button><a href="/">Restart Game</a></button>
+{% endblock %}
