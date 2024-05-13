@@ -16,15 +16,19 @@ highest_score = 0
 def start_page():
     """Route to start boggle game"""
     global total_score
-    session.clear()
+    # session.clear()
 
     board = boggle_game.make_board()
     session['board'] = board
+    print(session['board'])
     # reset total score
     total_score = 0
 
-    highest_score = session.get('highest_score', 0)
-    num_games_played = session.get('num_games_played', 0)
+    session['highest_score'] = highest_score
+    session['num_games_played'] = num_games_played
+
+    # highest_score = session.get('highest_score', 0)
+    # num_games_played = session.get('num_games_played', 0)
 
     return render_template('index.html', board=board, score=total_score, highest_score=highest_score, num_games_played=num_games_played)
 
@@ -34,6 +38,8 @@ def submit_guess():
     global total_score
     # get the guess from the request data
     guess = request.json['guess']
+    if 'board' not in session:
+        return jsonify({'error': 'No board found in session'}), 400
         # check if guess is a valid word
     result = boggle_game.check_valid_word(session['board'], guess)
     if result == 'ok':
@@ -57,9 +63,8 @@ def game_over():
     if request.method == 'POST':
         data = request.json
         score = data.get('score')
-        print('recieved score:', score)
-
         score = int(score)
+
         if score > highest_score:
              highest_score = score
     
