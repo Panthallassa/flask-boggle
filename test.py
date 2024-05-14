@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 from app import app
 from flask import session
@@ -23,8 +24,6 @@ class FlaskTests(TestCase):
             with client.session_transaction() as sess:
                 # check if board key is present in session
                 self.assertIn('board', sess)
-                # check if stored board matches the one showing
-                self.assertEqual(sess['board'], self.boggle_game.make_board())
                 # check if higheset_score key is present in session
                 self.assertIn('highest_score', sess)
                 # ensure that the highest score varibale is correctly initialized to 0 in the session
@@ -37,20 +36,25 @@ class FlaskTests(TestCase):
     def test_submit_guess(self):
         """Test submit_guess route"""
         # set up session with a sample board
-        with self.client.session_transaction() as sess:
-            sess['board'] = [['C', 'A', 'T'], ['D', 'E', 'F'], ['G', 'H', 'I']]
-            # Send a POST request with a guess
-            response = self.client.post('/submit_guess', json={'guess': 'CAT'})
-            # check is response is successful
-            self.assertEqual(response.status_code, 200)
-            # Check if the response contains expected JSON data
-            data = json.loads(response.data)
-            self.assertIn('result', data)
-            self.assertIn('score', data)
+        with self.client as client:
+            with client.session_transaction() as sess:
+                sess['board'] = [['C', 'A', 'T', 'O', 'F'], 
+                                 ['D', 'E', 'F', 'O', 'F'], 
+                                 ['G', 'H', 'I', 'O', 'F'], 
+                                 ['G', 'H', 'I', 'O', 'F'], 
+                                 ['G', 'H', 'I', 'O', 'F']]
+        # Send a POST request with a guess
+        response = client.post('/submit_guess', json={'guess': 'cat'})
+        # check is response is successful
+        self.assertEqual(response.status_code, 200)
+        # Check if the response contains expected JSON data
+        data = json.loads(response.data)
+        self.assertIn('result', data)
+        self.assertIn('score', data)
 
-            # check if score is correctly calculated and result 'ok'
-            self.assertEqual(data['result'], 'ok')
-            self.assertEqual(data['score'], 3)
+        # check if score is correctly calculated and result 'ok'
+        self.assertEqual(data['result'], 'ok')
+        self.assertEqual(data['score'], 3)
 
         def test_game_over_post(self):
             """Test game_over route with POST request"""
@@ -78,14 +82,15 @@ class FlaskTests(TestCase):
             with self.client.session_transaction() as sess:
                 sess['highest_score'] = 10
                 sess['num_games_played'] = 1
+                # Send POST requeset to update the highest score
+                response = self.client.post('/game-over', json={'score': 10})
+            # Send a GET request to render the game over template
+            response = self.client.get('/game-over')
 
-                # Send a GET request to render the game over template
-                response = self.client.get('/game-over')
+            # Check if the response is successful
+            self.assertEqual(response.status_code, 200)
 
-                # Check if the response is successful
-                self.assertEqual(response.status_code, 200)
-
-                # Check if the response contains the expected HTML content
-                self.assertIn(b'<h1>Game Over!</h1>', response.data)
-                self.assertIn(b'Highest Score: 10', response.data)
-                self.assertIn(b'Number of Times Played: 1', response.data)
+            # Check if the response contains the expected HTML content
+            self.assertIn(b'<h1>Game Over!</h1>', response.data)
+            self.assertIn(b'Highest Score: 10', response.data)
+            self.assertIn(b'Number of Times Played: 1', response.data)
